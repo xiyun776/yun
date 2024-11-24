@@ -1,0 +1,38 @@
+char a[1000][501];
+int v[1000][501];
+int n, m, x, y, flag, ans=1e5, s;
+int t[4] = { 0,1,-1,0 };
+int f[4] = { 1,0,0,-1 };
+void dfs(int x, int y, int s)
+{
+    if (a[x][y] == 'E') { ans = min(ans, s); flag = 1; return; }
+    for (int i = 0; i < 4; i++)
+    {
+        int nx = x + t[i]; int ny = y + f[i];
+        if (!v[nx][ny] && a[nx][ny] != '#' && nx >= 1 && nx <= n && ny >= 1 && ny <= m)
+        {
+            v[nx][ny] = 1; dfs(nx, ny, s + 1); v[nx][ny] = 0;
+        }
+    }
+}
+int main()
+{
+    cin >> n >> m;
+    for (int i = 1; i <= n; i++)
+    {
+        for (int j = 1; j <= m; j++)
+        {
+            cin >> a[i][j];
+            if (a[i][j] == 'S')
+            {
+                x = i; y = j;
+            }
+        }
+    }
+    v[x][y] = 1;
+    dfs(x, y, 0);
+    v[x][y] = 0;
+    if (flag == 1)cout << "Yes" << endl<<"最短步数是: "<<ans<<endl;
+    else cout << "No" << endl;
+    return 0;
+}
