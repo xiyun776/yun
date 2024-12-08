@@ -1,0 +1,653 @@
+#include<stdio.h>
+#include<stdlib.h>
+#include<string.h>
+#include<iostream>
+using namespace std;
+
+typedef struct Book {
+    int num;
+    int borrowed;
+    char name[20];
+    char writer[20];
+    char time[20];
+} Book;//图书
+
+typedef struct BookNode {
+    struct BookNode* next = NULL;
+    Book book;
+} BookNode;//图书链表
+
+typedef struct User {
+    int num;
+    BookNode* borrowed = NULL;
+    char name[20];
+} User; //用户
+
+typedef struct UserNode {
+    struct UserNode* next = NULL;
+    User user;
+} UserNode; //用户链表
+
+BookNode* book_list = NULL;//全局变量
+UserNode* user_list = NULL;//全局变量
+
+//函数声明
+void showMainMenu();
+void showBookMenu();
+void showUserMenu();
+void addBook();
+void deleteBook();
+void updateBook();
+void searchBook();
+void listBooks();
+void addUser();
+void deleteUser();
+void updateUser();
+void searchUser();
+void listUsers();
+void borrowReturnBook();
+void dataManagement();
+void saveDataToFile();
+void loadDataFromFile();
+int main()
+{
+    int choice = 0;
+    do
+    {
+        showMainMenu();
+        cin >> choice;
+        switch (choice)
+        {
+        case 1: {
+            showBookMenu();
+            break;
+        }
+        case 2: {
+            showUserMenu();
+            break;
+        }
+        case 3: {
+            borrowReturnBook();
+            break;
+        }
+        case 4: {
+            dataManagement();
+            break;
+        }
+        case 5:
+            break;
+        default:
+            cout << "输入数字非法,请重新选择" << endl << endl;
+        }
+    } while (choice != 5);
+    return 0;
+}
+
+void showMainMenu() //主菜单显示函数
+{
+    printf("主菜单:\n");
+    printf("1. 图书管理\n");
+    printf("2. 用户管理\n");
+    printf("3. 用户借书/还书\n");
+    printf("4. 数据管理\n");
+    printf("5. 退出系统\n");
+    printf("请选择: ");
+}
+
+void showBookMenu()//图书管理二级菜单
+{
+    int bookchoice = 0;
+    do
+    {
+        cout << "图书管理菜单: " << endl << "1. 增加图书" << endl
+            << "2. 删除图书" << endl << "3. 修改图书信息" << endl
+            << "4. 查找图书" << endl << "5. 列出所有图书" << endl
+            << "6. 返回主菜单" << endl << "请选择: ";
+        cin >> bookchoice;
+        switch (bookchoice)
+        {
+        case 1: {
+            addBook();
+            break;
+        }
+        case 2: {
+            deleteBook();
+            break;
+        }
+        case 3: {
+            updateBook();
+            break;
+        }
+        case 4: {
+            searchBook();
+            break;
+        }
+        case 5: {
+            listBooks();
+            break;
+        }
+        case 6:
+            break;
+        default:
+            cout << "输入数字非法,请重新选择" << endl << endl;
+        }
+    } while (bookchoice != 6);
+}
+
+void showUserMenu()//用户管理二级菜单
+{
+    int userchoice = 0;
+    do
+    {
+        cout << "用户管理菜单: " << endl << "1. 增加用户" << endl
+            << "2. 删除用户" << endl << "3. 修改用户信息" << endl
+            << "4. 查找用户" << endl << "5. 列出所有用户" << endl
+            << "6. 返回主菜单" << endl << "请选择: " << endl;
+        cin >> userchoice;
+        switch (userchoice)
+        {
+        case 1: {
+            addUser();
+            break;
+        }
+        case 2: {
+            deleteUser();
+            break;
+        }
+        case 3: {
+            updateUser();
+            break;
+        }
+        case 4: {
+            searchUser();
+            break;
+        }
+        case 5: {
+            listUsers();
+            break;
+        }
+        case 6:
+            break;
+        default:
+            cout << "输入数字非法,请重新选择" << endl << endl;
+        }
+    } while (userchoice != 6);
+}
+BookNode* createBookNode(Book book)//创建图书节点
+{
+    BookNode* node = (BookNode*)malloc(sizeof(BookNode));
+    cout << "请输入图书编号: ";
+    cin >> node->book.num;
+    cout << "请输入书名: ";
+    cin >> node->book.name;
+    cout << "请输入作者: ";
+    cin >> node->book.writer;
+    cout << "请输入出版日期: ";
+    cin >> node->book.time;
+    node->book.borrowed = 0;
+    node->next = NULL;
+    return node;
+}
+void insertBook(Book book)//插入图书节点
+{
+    BookNode* tem = (BookNode*)malloc(sizeof(BookNode));
+    tem->book = book;
+    tem->next = NULL;
+    if (book_list == NULL)
+        book_list = tem;
+    else if (tem->book.num < book_list->book.num)
+    {
+        tem->next = book_list;
+        book_list = tem;
+    }
+    else
+    {
+        BookNode* current = book_list;
+        while (current->next != NULL &&
+            current->next->book.num < tem->book.num)
+            current = current->next;
+        tem->next = current->next;
+        current->next = tem;
+    }
+}
+
+
+void addBook() //增加图书
+{
+    Book book = { 0 }; // 对book进行零初始化
+    BookNode* node = createBookNode(book);
+    insertBook(node->book);
+    cout << "图书添加成功" << endl << endl;
+}
+
+
+void deleteBook()//删除图书
+{
+    int id;
+    cout << "输入要删除图书的编号: " << endl;
+    cin >> id;
+    BookNode* front = NULL;
+    BookNode* current = book_list;
+    while (current != NULL)
+    {
+        if (current->book.num == id)
+        {
+            if (front == NULL)book_list = current->next;
+            else front->next = current->next;
+            free(current);
+            cout << "删除成功" << endl << endl;
+            return;
+        }
+        front = current;
+        current = current->next;
+    }
+    cout << "该图书不存在" << endl << endl;
+}
+
+void updateBook()//修改图书信息
+{
+    int id;
+    cout << "输入要修改图书的编号: " << endl;
+    cin >> id;
+    BookNode* current = book_list;
+    while (current != NULL)
+    {
+        if (current->book.num == id)
+        {
+            cout << "找到该图书" << endl;
+            cout << "请输入新的图书编号: ";
+            cin >> current->book.num;
+            cout << "请输入新的书名: ";
+            cin >> current->book.name;
+            cout << "请输入新的作者: ";
+            cin >> current->book.writer;
+            cout << "请输入新的出版日期: ";
+            cin >> current->book.time;
+            cout << "图书修改成功" << endl << endl;
+            return;
+        }
+        current = current->next;
+    }
+    cout << "该图书不存在" << endl << endl;
+}
+
+void searchBook()//查找图书
+{
+    int id;
+    cout << "输入要查找图书的编号: " << endl;
+    cin >> id;
+    BookNode* current = book_list;
+    while (current != NULL)
+    {
+        if (current->book.num == id)
+        {
+            cout << "找到该图书" << endl;
+            cout << "图书编号: " << current->book.num << endl
+                << "图书名字: " << current->book.name << endl
+                << "图书作者: " << current->book.writer << endl
+                << "图书出版时间: " << current->book.time << endl;
+            cout << "是否已被借出: ";
+            if (current->book.borrowed == 1)cout << "是" << endl << endl;
+            else cout << "否" << endl << endl;
+            return;
+        }
+        current = current->next;
+    }
+    cout << "该图书不存在" << endl << endl;
+}
+
+void listBooks()//列出所有图书
+{
+    BookNode* current = book_list;
+    while (current != NULL)
+    {
+        cout << "图书编号: " << current->book.num << endl
+            << "图书名字: " << current->book.name << endl
+            << "图书作者: " << current->book.writer << endl
+            << "图书出版时间: " << current->book.time << endl;
+        cout << "是否已被借出: ";
+        if (current->book.borrowed == 1)cout << "是" << endl << endl;
+        else cout << "否" << endl << endl;
+        current = current->next;
+    }
+    cout << endl;
+}
+
+
+
+UserNode* createUserNode(User user)//创建用户节点
+{
+    UserNode* node = (UserNode*)malloc(sizeof(UserNode));
+    cout << "请输入用户编号: ";
+    cin >> node->user.num;
+    cout << "请输入用户姓名: ";
+    cin >> node->user.name;
+    node->user.borrowed = NULL;
+    node->next = NULL;
+    return node;
+}
+
+void insertUser(User user)//插入用户节点
+{
+    UserNode* tem = (UserNode*)malloc(sizeof(UserNode));
+    tem->user = user;
+    tem->next = NULL;
+    if (user_list == NULL)
+        user_list = tem;
+    else if (tem->user.num < user_list->user.num)
+    {
+        tem->next = user_list;
+        user_list = tem;
+    }
+    else
+    {
+        UserNode* current = user_list;
+        while (current->next != NULL &&
+            current->next->user.num < tem->user.num)
+            current = current->next;
+        tem->next = current->next;
+        current->next = tem;
+    }
+}
+
+void addUser()//增加用户
+{
+    User user;
+    UserNode* node = createUserNode(user);
+    insertUser(node->user);
+    cout << "用户添加成功" << endl << endl;
+}
+
+void deleteUser()//删除用户
+{
+    int id;
+    cout << "输入要删除用户的编号: " << endl;
+    cin >> id;
+    UserNode* front = NULL;
+    UserNode* current = user_list;
+    while (current != NULL)
+    {
+        if (current->user.num == id)
+        {
+            if (front == NULL)user_list = current->next;
+            else front->next = current->next;
+            free(current);
+            cout << "删除成功" << endl << endl;
+            return;
+        }
+        front = current;
+        current = current->next;
+    }
+    cout << "该用户不存在" << endl << endl;
+}
+
+void updateUser()//修改用户信息
+{
+    int id;
+    cout << "输入要修改用户的编号: " << endl;
+    cin >> id;
+    UserNode* current = user_list;
+    while (current != NULL)
+    {
+        if (current->user.num == id)
+        {
+            cout << "找到该用户" << endl;
+            cout << "请输入新的用户编号: ";
+            cin >> current->user.num;
+            cout << "请输入新的用户姓名: ";
+            cin >> current->user.name;
+            cout << "用户修改成功" << endl << endl;
+            return;
+        }
+        current = current->next;
+    }
+    cout << "该用户不存在" << endl << endl;
+}
+
+void searchUser()//查找用户
+{
+    int id;
+    cout << "输入要查找用户的编号: " << endl;
+    cin >> id;
+    UserNode* current = user_list;
+    while (current != NULL)
+    {
+        if (current->user.num == id)
+        {
+            cout << "找到该用户" << endl;
+            cout << "用户编号: " << current->user.num << endl
+                << "用户姓名: " << current->user.name << endl << endl;
+            return;
+        }
+        current = current->next;
+    }
+    cout << "该用户不存在" << endl << endl;
+}
+
+void listUsers()//列出所有用户
+{
+    UserNode* current = user_list;
+    while (current != NULL)
+    {
+        cout << "用户编号: " << current->user.num << endl
+            << "用户姓名: " << current->user.name << endl << endl;
+        current = current->next;
+    }
+    cout << endl;
+}
+void borrowReturnBook()
+{
+    int operation = 100;
+    cout << "1表示借书，0表示还书" << endl << "请输入: ";
+    cin >> operation;
+    int user_id, book_id;
+    cout << "输入用户编号: ";
+    cin >> user_id;
+    cout << "输入图书编号: ";
+    cin >> book_id;
+    UserNode* user_current = user_list;
+    while (user_current != NULL) {
+        if (user_current->user.num == user_id) {
+            BookNode* book_current = book_list;
+            while (book_current != NULL) {
+                if (book_current->book.num == book_id) {
+                    if (operation == 1) {
+                        if (book_current->book.borrowed == 0) {
+                            book_current->book.borrowed = 1;
+                            BookNode* new_borrowed = (BookNode*)malloc(sizeof(BookNode));
+                            new_borrowed->book = book_current->book;
+                            new_borrowed->next = user_current->user.borrowed;
+                            user_current->user.borrowed = new_borrowed;
+                            cout << "借书成功" << endl << endl;
+                        }
+                        else
+                            cout << "该书已被借出" << endl << endl;
+                    }
+                    else {
+                        if (book_current->book.borrowed == 1)
+                        {
+                            book_current->book.borrowed = 0;
+                            BookNode* prev = NULL;
+                            BookNode* cur = user_current->user.borrowed;
+                            while (cur != NULL)
+                            {
+                                if (cur->book.num == book_id)
+                                {
+                                    if (prev == NULL)
+                                        user_current->user.borrowed = cur->next;
+                                    else
+                                        prev->next = cur->next;
+                                    free(cur);
+                                    cout << "还书成功" << endl << endl;
+                                    break;
+                                }
+                                prev = cur;
+                                cur = cur->next;
+                            }
+                        }
+                        else
+                            cout << "该书未被借出，无需归还" << endl << endl;
+                    }
+                    return;
+                }
+                book_current = book_current->next;
+            }
+            cout << "未找到该图书" << endl << endl;
+            return;
+        }
+        user_current = user_current->next;
+    }
+    cout << "未找到该用户" << endl << endl;
+}
+void dataManagement()//数据管理二级菜单
+{
+    int choice = 0;
+    do
+    {
+        cout << "数据管理二级菜单:" << endl << "1. 保存数据到文件"
+            << endl << "2. 从文件加载数据" << endl
+            << "3. 返回主菜单" << endl << "请选择: ";
+        cin >> choice;
+        switch (choice)
+        {
+        case 1: {
+            saveDataToFile();
+            break;
+        }
+        case 2: {
+            loadDataFromFile();
+            break;
+        }
+        case 3:
+            break;
+        default:
+            cout << "输入数字非法,请重新选择" << endl << endl;
+        }
+    } while (choice != 3);
+}
+
+
+void saveDataToFile()// 保存数据到文件函数
+{
+    FILE* file = fopen("library_data.txt", "w");
+    if (file == NULL)
+    {
+        cout << "无法打开文件 library_data.txt 进行写入" << endl;
+        return;
+    }
+
+    BookNode* bookCurrent = book_list;
+    while (bookCurrent != NULL)
+    {
+        fprintf(file, "%d %d %s %s %s\n",
+            bookCurrent->book.num,
+            bookCurrent->book.borrowed,
+            bookCurrent->book.name,
+            bookCurrent->book.writer,
+            bookCurrent->book.time);
+        bookCurrent = bookCurrent->next;
+    }
+    fprintf(file, "#\n");
+    
+    UserNode* userCurrent = user_list;
+    while (userCurrent != NULL)
+    {
+        fprintf(file, "%d %s\n", userCurrent->user.num, userCurrent->user.name);
+        BookNode* borrowedBook = userCurrent->user.borrowed;
+        while (borrowedBook != NULL)
+        {
+            fprintf(file, "%d\n", borrowedBook->book.num);
+            borrowedBook = borrowedBook->next;
+        }
+        fprintf(file, "*\n");
+        userCurrent = userCurrent->next;
+    }
+
+    fclose(file);
+    cout << "数据已成功保存到文件" << endl << endl;
+}
+
+void loadDataFromFile()// 从文件加载数据函数
+{
+    FILE* file = fopen("library_data.txt", "r");
+    if (file == NULL)
+    {
+        cout << "无法打开文件 library_data.txt 进行读取" << endl;
+        return;
+    }
+
+    char line[100];
+    Book book;
+
+    while (true)
+    {
+        if (!fgets(line, sizeof(line), file)) break;
+        if (line[0] == '#')
+            break;
+        int ret = sscanf(line, "%d %d %s %s %s",
+            &book.num, &book.borrowed,
+            book.name,
+            book.writer,
+            book.time);
+        if (ret == 5) {
+            insertBook(book);
+        }
+    }
+
+    User user;
+    bool userDataStarted = false;
+    memset(&user, 0, sizeof(User));
+
+    while (fgets(line, sizeof(line), file))
+    {
+        char* p = strchr(line, '\n');
+        if (p) *p = '\0';
+
+        if (line[0] == '\0') continue;
+
+        if (line[0] == '*') {
+            if (userDataStarted) {
+                insertUser(user);
+                memset(&user, 0, sizeof(User));
+                userDataStarted = false;
+            }
+            continue;
+        }
+
+        int userNum;
+        char userName[20];
+        int ret = sscanf(line, "%d %s", &userNum, userName);
+        if (ret == 2) {
+            if (userDataStarted) {
+                insertUser(user);
+            }
+            memset(&user, 0, sizeof(User));
+            user.num = userNum;
+            strcpy(user.name, userName);
+            user.borrowed = NULL;
+            userDataStarted = true;
+        }
+        else {
+            if (!userDataStarted) {
+                continue;
+            }
+
+            int borrowedBookNum;
+            if (sscanf(line, "%d", &borrowedBookNum) == 1) {
+                BookNode* current = book_list;
+                while (current != NULL && current->book.num != borrowedBookNum) {
+                    current = current->next;
+                }
+                if (current != NULL) {
+                    BookNode* newBorrowedNode = (BookNode*)malloc(sizeof(BookNode));
+                    newBorrowedNode->book = current->book;
+                    newBorrowedNode->next = user.borrowed;
+                    user.borrowed = newBorrowedNode;
+                    current->book.borrowed = 1;
+                }
+            }
+        }
+    }
+    fclose(file);
+    cout << "数据已成功从文件加载" << endl << endl;
+}
