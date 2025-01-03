@@ -1,0 +1,35 @@
+#include<sys/stat.h>
+#include<sys/mman.h>
+#include<errno.h>
+#include<sys/types.h>
+#include<sys/wait.h>
+#include<unistd.h>
+#include<stdlib.h>
+#include<fcntl.h>
+#include<string.h>
+#include<stdio.h>
+#include<time.h>
+#include<mqueue.h>
+#include<pthread.h>
+#define thread_count 20000
+static pthread_mutex_t yun=PTHREAD_MUTEX_INITIALIZER;
+void* add_thread(void* arg)
+{
+	int* p = (int*)arg;
+	pthread_mutex_lock(&yun);
+	(*p)++;
+	pthread_mutex_unlock(&yun);
+	return (void*)0;
+}
+int main(int argc,char const *argv[])
+{
+	pthread_t pid[thread_count];
+	int num = 0;
+	for (int i = 0; i < thread_count; i++)
+		pthread_create(pid + i,NULL,add_thread, &num);
+	for (int i = 0; i < thread_count; i++)
+		pthread_join(pid[i], NULL);
+	printf("累加的结果是 %d\n", num);
+	return 0;
+}
+
