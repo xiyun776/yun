@@ -1,5 +1,7 @@
 该项目为车载多媒体，使用qt6和cmake编译，需要注意的地方注释在代码和CMakeLists中。
 运行直接执行car.sh即可，或者手动配置Makefile也行。
+有问题可以私信我邮箱: yun.com.155052@qq.com
+麻烦给一个小星星!
 
 cmake -DCMAKE_PREFIX_PATH=/usr/lib/x86_64-linux-gnu/cmake/Qt6 ..
 分解说明：
