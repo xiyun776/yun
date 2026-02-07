@@ -1,0 +1,8 @@
+/home/yun/桌面/car/build/CMakeFiles/car.dir
+/home/yun/桌面/car/build/CMakeFiles/edit_cache.dir
+/home/yun/桌面/car/build/CMakeFiles/rebuild_cache.dir
+/home/yun/桌面/car/build/CMakeFiles/list_install_components.dir
+/home/yun/桌面/car/build/CMakeFiles/install.dir
+/home/yun/桌面/car/build/CMakeFiles/install/local.dir
+/home/yun/桌面/car/build/CMakeFiles/install/strip.dir
+/home/yun/桌面/car/build/CMakeFiles/car_autogen.dir

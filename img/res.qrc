@@ -1,0 +1,27 @@
+<RCC>
+    <qresource prefix="/">
+        <file>back.png</file>
+        <file>bg.jpg</file>
+        <file>cloud.png</file>
+        <file>clouds_storm.png</file>
+        <file>cloudy_sun.png</file>
+        <file>fast-backward.png</file>
+        <file>fast-forward.png</file>
+        <file>map.png</file>
+        <file>music.png</file>
+        <file>pause.png</file>
+        <file>play.png</file>
+        <file>res.qrc</file>
+        <file>skip-back.png</file>
+        <file>skip-forward.png</file>
+        <file>sunny.png</file>
+        <file>sunset.png</file>
+        <file>video.png</file>
+        <file>weather.png</file>
+        <file>zoom-in.png</file>
+        <file>zoom-out.png</file>
+        <file>car.jpg</file>
+        <file>myplayer_bg.jpg</file>
+        <file>up.jpg</file>
+    </qresource>
+</RCC>
